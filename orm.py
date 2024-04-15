@@ -17,7 +17,8 @@ class User(Base):
     name: Mapped[str] = mapped_column()
     fullname: Mapped[str] = mapped_column()
 
-    addresses = relationship("Address", backref="user")
+    addresses = relationship("Address", backref="user",
+                             cascade="all, delete-orphan")
 
     def __repr__(self):
         return "<User(name='%s', fullname='%s')>" % (
@@ -56,9 +57,14 @@ user = session.query(User).join(Address, User.id == Address.user_id).first()
 # else:
 #     print("User not found")
 
-users = session.query(User).options(joinedload(User.addresses)).all()
+user1 = session.query(User).filter(User.id == 3).first()
+print(user1)
+session.delete(user1)
+session.commit()
 
-for user in users:
-    print(f"User: {user.name}")
-    for address in user.addresses:
-        print(f"\tEmail: {address.email}")
+# users = session.query(User).options(joinedload(User.addresses)).all()
+
+# for user in users:
+#     print(f"User: {user.name}")
+#     for address in user.addresses:
+#         print(f"\tEmail: {address.email}")
